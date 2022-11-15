@@ -1,4 +1,5 @@
-cffi==1.14.4
+#cffi==1.14.4
+cffi
 cryptography==3.3.2
 pycparser==2.20
 PyMySQL==0.10.1
