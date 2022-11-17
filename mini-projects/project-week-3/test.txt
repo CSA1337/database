@@ -1,2 +1,0 @@
-{'courier_name': 'Sss'}
-{'courier_name': 'Ddd'}

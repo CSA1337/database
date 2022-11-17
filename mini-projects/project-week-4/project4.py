@@ -1,51 +1,44 @@
+from os import system, name
+import pandas as pd
 import copy
-from os import name, system
+import json
+from io import StringIO
+from tabulate import tabulate
 
 products = []
 couriers = []
+orders = []
 courier = {}
 order = {}
-orders = []
-products_location = "/home/samx/Desktop/mini-projects/test/products.txt"
-couriers_location = "/home/samx/Desktop/mini-projects/test/couriers.txt"
-orders_location = "/home/samx/Desktop/mini-projects/test/orders.txt"
+
+
+def pull_data(file_name:str) -> list:
+    with open(file_name, 'r') as data:
+        return json.load(data)
+
+def save_data(list_to_save: list , file_name: str):
+    with open(file_name, 'w') as data:
+        json.dump(list_to_save, data, indent=4)
 
 def load_products():
-    file = open(products_location, 'r')
+    file = open('products.txt', 'r')
     for line in file.readlines():
         products.append(line.rstrip("\n"))
 
-def load_couriers():
-    file = open(couriers_location, 'r')
-    for line in file.readlines():
-        couriers.append(line.rstrip("\n"))
-
-def load_orders():
-    file = open(orders_location, 'r')
-    for line in file.readlines():
-        orders.append(line.rstrip("\n"))
-
 def error():
     print("Error! Invalid input. Try again...")
-    
+
 def write_product():
-    with open (products_location, 'w') as file:
+    with open ('products.txt', 'w') as file:
         for product in products:
             file.write(product)
             file.write("\n")
 
-def write_couriers():
-    with open (couriers_location, 'w') as file:
-        for courier in couriers:
-            file.write(courier)
-            file.write("\n")
-
 def write_orders():
-    with open (orders_location, 'w') as file:
-        for order in orders:
-            file.write(str(order))
-            file.write("\n")
+    save_data(orders, 'orders.json')
 
+def write_couriers():
+    save_data(couriers, 'couriers.json')
 
 def main():
     while True:
@@ -106,8 +99,6 @@ def product_menu():
             print("Product has been deleted...")
             product_menu()
 
-
-
 def print_product():
     print("+=======================+")
     print("|   ALL   PRODUCTS      |")
@@ -145,9 +136,6 @@ def delete_product():
         break
     write_product()
 
-
-
-
 def order_menu():
     while True:
         try:
@@ -181,12 +169,7 @@ def order_menu():
             print("Order has been deleted...")
 
 def order_list():
-    print("+=======================+")
-    print("|   ALL   Orders      |")
-    print("+=======================+")
-    for x in range(len(orders)):
-        print(f"[{x}] - ", orders[x])
-    print("+=======================+")
+    print(tabulate(orders,showindex=True,headers='keys',tablefmt='fancy_grid'))
 
 def create_order():
     while True:
@@ -202,7 +185,7 @@ def create_order():
     while True:
         number = input("Customer Phone: ")
         if len(number) == 11 and number.isdigit() == True:
-            order["customer_number"] = number
+            order["customer_phone"] = number
             break
         else:
             print("Invalid input. Try again.")
@@ -210,7 +193,6 @@ def create_order():
     order["order_status"] = "Received"
     dict_copy = copy.deepcopy(order)
     orders.append(dict_copy)
-    #orders.append(order)
 
 def update_order():
     while True:
@@ -262,13 +244,11 @@ def order_status():
                     break
             break
 
-
-
 def courier_menu():
     while True:
         try:
             print("\n\n0 - Main menu\n1 - All Couriers\n2 - New Courier")
-            print("3 - Update Courier\n5 - Delete Courier")
+            print("3 - Update Courier\n4 - Delete Courier")
             choice = int(input("\nOption: "))
             if choice not in range(0,5):
                 error()
@@ -287,29 +267,35 @@ def courier_menu():
             courier_list()
             update_courier()
             print("Courier has been Updated...")
-        elif choice == 5:
+        elif choice == 4:
             courier_list()
             delete_courier()
             print("Courier has been deleted...")
 
 def courier_list():
-    print("+=======================+")
-    print("|   ALL   Couriers      |")
-    print("+=======================+")
-    for x in range(len(couriers)):
-        print(f"[{x}] - ", couriers[x])
-    print("+=======================+")
+    print(tabulate(couriers,showindex=True,headers='keys',tablefmt='fancy_grid'))
 
 def create_courier():
     while True:
-        name = input("Courier Name: ")
+        name = input("Customer Name: ")
         if name.isalpha() == True:
-            courier["courier_name"] = name.title()
+            courier["customer_name"] = name.title()
             break
         else:
             print("Invalid input!!!")
             continue
-    #couriers.append(courier)
+    c_name = input("Courier Name: ")
+    courier["courier_name"] = c_name
+    address = input("Customer Address: ")
+    courier["customer_address"] = address
+    while True:
+        number = input("Customer Phone: ")
+        if len(number) == 11 and number.isdigit() == True:
+            courier["customer_number"] = number
+            break
+        else:
+            print("Invalid input. Try again.")
+            continue
     dict_copy = copy.deepcopy(courier)
     couriers.append(dict_copy)
 
@@ -317,26 +303,18 @@ def update_courier():
     while True:
         try:
             option = int(input("Option: "))
+            courier = couriers[option]
             break
         except:
             error()
             continue
-    
-    
-    new_value = input("Enter New Value: ")
-    if new_value.strip() == '':
-        courier_menu()
-    else:
-        couriers[option]['courier_name'].append(new_value)
-        #couriers[option]['courier_name']
-    #for key, value in couriers.items():
-        #print(f"Key: {key}, Value: {value}")
-        #input("ggggg")
-        #new_value = input("Enter New Value: ")
-        #if new_value.strip() == '':
-        #    continue
-        #else:
-        #    courier[key] = new_value
+    for key, value in courier.items():
+        print(f"Key: {key}, Value: {value}")
+        new_value = input("Enter New Value: ")
+        if new_value.strip() == '':
+            continue
+        else:
+            courier[key] = new_value
 
 def delete_courier():
     while True:
@@ -348,28 +326,6 @@ def delete_courier():
             error()
             continue
     couriers.remove(courier)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 def main_banner():
     print("""
@@ -421,7 +377,8 @@ def clear():
 	else:
 		_ = system('clear')
 
-load_products()
-load_couriers()
-load_orders()
-main()
+if __name__ == "__main__":
+    load_products()
+    couriers = pull_data('couriers.json')
+    orders = pull_data('orders.json')
+    main()
