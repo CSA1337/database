@@ -84,7 +84,7 @@ def product_menu():
             error()
             continue
         if choice == 0:
-            main()
+            return
         elif choice == 1:
             print_product()
         elif choice == 2:
@@ -97,7 +97,7 @@ def product_menu():
             print_product()
             delete_product()
             print("Product has been deleted...")
-            product_menu()
+            
 
 def print_product():
     print("+=======================+")
@@ -149,7 +149,7 @@ def order_menu():
             error()
             continue
         if choice == 0:
-            main()
+            return
         elif choice == 1:
             order_list()
         elif choice == 2:
@@ -257,7 +257,7 @@ def courier_menu():
             error()
             continue
         if choice == 0:
-            main()
+            return
         elif choice == 1:
             courier_list()
         elif choice == 2:
@@ -291,7 +291,7 @@ def create_courier():
     while True:
         number = input("Customer Phone: ")
         if len(number) == 11 and number.isdigit() == True:
-            courier["customer_number"] = number
+            courier["customer_phone"] = number
             break
         else:
             print("Invalid input. Try again.")
